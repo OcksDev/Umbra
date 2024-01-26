@@ -42,6 +42,7 @@ public class Gamer : MonoBehaviour
     public Card PlayerLastCard = null;
     public Card AILastCard = null;
     public Card LastCardTrue = null;
+    public Card AILastCardTrue = null;
     public int SameCardStreak = 0;
     public int SweepCount = 0;
 
@@ -281,11 +282,24 @@ public class Gamer : MonoBehaviour
             PLayerEnergy = 0;
             EndTurnCheck();
         }
+
+
+        miscrefs[94].GetComponent<ITurnCountShitBitch>().UpdateColors(IsPlayerTurn);
+
     }
 
     public void AddCardTohand()
     {
-        var p = dick.DrawCard();
+        Card p = null;
+        if(determined_draw_cards.Count > 0)
+        {
+            p = new Card(determined_draw_cards[0]);
+            determined_draw_cards.RemoveAt(0);
+        }
+        else
+        {
+            p = dick.DrawCard();
+        }
         if (p != null)
         {
             p.IsPlayerControlled = true;
@@ -298,23 +312,53 @@ public class Gamer : MonoBehaviour
 
     public const float DefaultDelay = 0.1f;
     public const float DefaultStartDelay = 0f;
-
+    List<int> determined_draw_cards = new List<int>();
     public void DrawCards(int amount, float delay = DefaultDelay, float start_delay = DefaultStartDelay)
     {
         StartCoroutine(DrawCardsCor(amount, delay, start_delay));
     }
-
+    public bool DrawingCards = false;
     public IEnumerator DrawCardsCor(int amount, float delay = 0.2f, float start_delay = 0f)
     {
+        DrawingCards = true;
         if (start_delay > 0) yield return new WaitForSeconds(start_delay);
         for (int i = 0; i < amount; i++)
         {
             AddCardTohand();
             if (delay > 0) yield return new WaitForSeconds(delay);
         }
-
+        DrawingCards = false;
+        determined_draw_cards.Clear();
         yield return null;
     }
+
+    public IEnumerator WaitForEndDrawCardsShit()
+    {
+        if (IsPlayerTurn)
+        {
+            if (DrawingCards)
+            {
+                yield return new WaitUntil(() => { return !DrawingCards; });
+            }
+            bool shitted = false;
+            foreach (var card in dick.Hand)
+            {
+                if (CanPlayCard(card))
+                {
+                    shitted = true;
+                    break;
+                }
+            }
+            if (!shitted)
+            {
+                CardPlayed = null;
+                PlacerCard = null;
+                EndTurnCheck(false, false, true);
+            }
+            yield return null;
+        }
+    }
+
 
     public void Skip()
     {
@@ -2133,10 +2177,14 @@ public class Gamer : MonoBehaviour
         }
     }
 
-    public void EndTurnCheck(bool fucky = false, bool noendmessage = false)
+    public void EndTurnCheck(bool fucky = false, bool noendmessage = false, bool came = false)
     {
         if(CardPlayed == null || (!CardPlayed.CanCauseAttacks))AnnounceAction(noendmessage);
 
+        foreach (var cd in dick.Hand)
+        {
+            cd.UpdateData();
+        }
 
         FeebleOverload = false;
         BanishDiscardOverload = false;
@@ -2185,7 +2233,6 @@ public class Gamer : MonoBehaviour
 
         bool canagain = false;
         bool heavy = false;
-        bool force_end = false;
         var cardp = CardPlayed;
         if (!fucky && CABringOver != null)
         {
@@ -2256,7 +2303,7 @@ public class Gamer : MonoBehaviour
         }
 
 
-        if ((!canagain) || force_end)
+        if ((!canagain) || came)
         {
 
             foreach(var con in IsPlayerTurn ? PlayerCons : AICons)
@@ -2291,6 +2338,9 @@ public class Gamer : MonoBehaviour
                     Turncount++;
                 }
 
+                miscrefs[94].GetComponent<ITurnCountShitBitch>().UpdateColors(!IsPlayerTurn);
+
+
                 if (IsPlayerTurn)
                 {
                     AIEnergy += EnergyPerRound;
@@ -2317,7 +2367,10 @@ public class Gamer : MonoBehaviour
                     StartCoroutine(AITurn());
                 }
             }
-
+        }
+        else
+        {
+            StartCoroutine(WaitForEndDrawCardsShit());
         }
     }
 
@@ -2466,6 +2519,16 @@ public class Gamer : MonoBehaviour
                 }
                 break;
         }
+
+        if (f2.CardType == 16 && PlayerLastCard == null)
+        {
+            canclick = false;
+        }
+        if (f2.CardType == 28 && AILastCardTrue == null)
+        {
+            canclick = false;
+        }
+
         return canclick;
     }
     public int CardActionType(int index)
@@ -2492,6 +2555,8 @@ public class Gamer : MonoBehaviour
                 return 4;
             case 27:
                 return 12;
+            case 28:
+                return 13;
             case 20:
             case 8:
                 return 3;
@@ -2651,8 +2716,14 @@ public class Gamer : MonoBehaviour
         if (player && card.IsInstant)
         {
             ShitLeCard(card);
+        }else if (!player)
+        {
+            AILastCardTrue = card;
         }
-
+        foreach (var cd in dick.Hand)
+        {
+            cd.UpdateData();
+        }
         if (!player)
         {
             var disp = RandomFunctions.Instance.SpawnObject(1, miscrefs[42], miscrefs[42].transform.position, miscrefs[42].transform.rotation, false, "");
@@ -3069,9 +3140,9 @@ public class Gamer : MonoBehaviour
                     {
                         RandomFunctions.Instance.SpawnObject(9, gameObject, new Vector3(-7.95f, 1.5f, 0), transform.rotation, false, "");
                         PlayerOnFire = 0;
-                        foreach(var con in PlayerCons)
+                        foreach (var con in PlayerCons)
                         {
-                            if(con != null)
+                            if (con != null)
                             {
                                 con.Cleanse();
                             }
@@ -3090,6 +3161,18 @@ public class Gamer : MonoBehaviour
                         }
                     }
 
+                    if (player)
+                    {
+                        DrawCards(1, DefaultDelay, 0.1f);
+                        EndTurnCheck();
+                    }
+                }
+                break;
+            case 13:
+                if (canclick)
+                {
+                    var lc = player ? AILastCardTrue : LastCardTrue;
+                    determined_draw_cards.Add(lc.CardType);
                     if (player)
                     {
                         DrawCards(1, DefaultDelay, 0.1f);
@@ -3798,6 +3881,7 @@ public class Gamer : MonoBehaviour
         SetSizes();
         canescape = false;
         checks[0] = true;
+        determined_draw_cards.Clear();
         Multiplayer = false;
         GameState = "Main Menu";
         miscrefs[33].SetActive(false);
@@ -4971,6 +5055,11 @@ public class Card
                 break;
             case 27:
                 energy = 3;
+                break;
+            case 28:
+                energy = 2;
+                SubNumber = 2;
+                again = true;
                 break;
         }
         CanAttack = attacker;

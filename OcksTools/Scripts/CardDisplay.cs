@@ -26,6 +26,7 @@ public class CardDisplay : MonoBehaviour
     public Image ClickMyVBS;
     public bool IsUnlocked = false;
     private float alaive = 0;
+    public Color[] colorsss;
     public List<GameObject> things = new List<GameObject>();
     // Start is called before the first frame update
 
@@ -65,6 +66,24 @@ public class CardDisplay : MonoBehaviour
                 tfc = tfc2;
                 imagestff = tfc.CardType;
             }
+        }
+        if (tfc.SubNumber == 2)
+        {
+            var tfc2 = (fc.IsPlayerControlled ? Gamer.Instance.AILastCardTrue : Gamer.Instance.LastCardTrue);
+            if (tfc2 != null)
+            {
+                tfc = tfc2;
+                imagestff = tfc.CardType;
+                Ass.color = colorsss[1];
+            }
+            else
+            {
+                Ass.color = colorsss[0];
+            }
+        }
+        else
+        {
+            Ass.color = colorsss[0];
         }
         Ass.sprite = Gamer.Instance.CardImages[imagestff];
         switch (imagestff)
@@ -275,28 +294,7 @@ public class CardDisplay : MonoBehaviour
                 {
                     if (g.PlacerState || g.DiscardState || g.FreezeState)
                     {
-                        bool k = g.PlacerCard == spawnData.card;
-                        if (!g.IsPlayerTurn) k = false;
-                        spawnData.card.IsHover = k;
-                        int i = -1;
-                        if (g.BanishDiscardOverload)
-                        {
-                            var remcards = g.dick.CardsInDeck;
-                            int z = 0;
-                            foreach (var cd in remcards)
-                            {
-                                if (cd.CardType == spawnData.card.CardType)
-                                {
-                                    i = z;
-                                    break;
-                                }
-                                z++;
-                            }
-                        }
-                        bool canclock = (k && !g.DiscardState) || (!k && g.DiscardState);
-                        if (canclock && g.BanishDiscardOverload) canclock = i > -1;
-                        if(canclock && g.FreezeState) canclock = false;
-                        butt.interactable = canclock;
+                        butt.interactable = BoightBoiBoils();
                     }
                     else
                     {
@@ -331,8 +329,31 @@ public class CardDisplay : MonoBehaviour
         }
     }
 
-    public void BoightBoiBoils()
+    public bool BoightBoiBoils()
     {
+        var g = Gamer.instance;
+        bool k = g.PlacerCard == spawnData.card;
+        if (!g.IsPlayerTurn) k = false;
+        spawnData.card.IsHover = k;
+        int i = -1;
+        if (g.BanishDiscardOverload)
+        {
+            var remcards = g.dick.CardsInDeck;
+            int z = 0;
+            foreach (var cd in remcards)
+            {
+                if (cd.CardType == spawnData.card.CardType)
+                {
+                    i = z;
+                    break;
+                }
+                z++;
+            }
+        }
+        bool canclock = (k && !g.DiscardState) || (!k && g.DiscardState);
+        if (canclock && g.BanishDiscardOverload) canclock = i > -1;
+        if (canclock && g.FreezeState) canclock = false;
+        return canclock;
     }
 
 
