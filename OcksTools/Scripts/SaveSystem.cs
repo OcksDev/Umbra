@@ -63,6 +63,8 @@ public class SaveSystem : MonoBehaviour
         }
         filenum = i;
         var s = SoundSystem.Instance;
+        GameFilePath = $"{FileSystem.Instance.GameDirectory}\\{GameDataFileName}_{filenum}.txt";
+        FileSystem.Instance.WriteFile(GameFilePath, "", false);
 
         int x = 0;
         UpdateUniversalData();
@@ -213,7 +215,7 @@ public class SaveSystem : MonoBehaviour
         Dictionary<string, string> sexymuscleactionmangerardbutler = new Dictionary<string, string>();
         foreach (var k in data)
         {
-            sexymuscleactionmangerardbutler.Add(k.Substring(0, k.IndexOf(": ")), k.Substring(k.IndexOf(": ") + 2));
+            if(k.IndexOf(": ") > -1)sexymuscleactionmangerardbutler.Add(k.Substring(0, k.IndexOf(": ")), k.Substring(k.IndexOf(": ") + 2));
         }
 
         FileSystem.Instance.UniversalData = sexymuscleactionmangerardbutler;
@@ -382,7 +384,7 @@ public class SaveSystem : MonoBehaviour
                 Dictionary<string, string> data = new Dictionary<string, string>();
                 foreach (var k in s)
                 {
-                    data.Add(k.Substring(0, k.IndexOf(": ")), k.Substring(k.IndexOf(": ") + 2));
+                    if(k.IndexOf(": ") > -1)data.Add(k.Substring(0, k.IndexOf(": ")), k.Substring(k.IndexOf(": ") + 2));
                 }
 
 

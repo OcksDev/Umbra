@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2902719744802103588}
   - component: {fileID: 2902719744802103589}
   - component: {fileID: 2902719744802103610}
+  - component: {fileID: 7113846884357960359}
   m_Layer: 5
   m_Name: Button (2)
   m_TagString: Untagged
@@ -135,6 +136,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &7113846884357960359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2902719744802103608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23f7af533a7a89443a33799cdbdc3b62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HoverClarifyText: Sorts cards based on energy cost
+  scale: 1
 --- !u!1 &2902719744843073026
 GameObject:
   m_ObjectHideFlags: 0
@@ -907,6 +922,7 @@ GameObject:
   - component: {fileID: 2902719745935521221}
   - component: {fileID: 2902719745935521242}
   - component: {fileID: 2902719745935521243}
+  - component: {fileID: 5047879784670114464}
   m_Layer: 5
   m_Name: Button (1)
   m_TagString: Untagged
@@ -1029,6 +1045,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &5047879784670114464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2902719745935521241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23f7af533a7a89443a33799cdbdc3b62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HoverClarifyText: Sorts cards by attributes
+  scale: 1
 --- !u!1 &2902719746018974021
 GameObject:
   m_ObjectHideFlags: 0
@@ -1118,6 +1148,7 @@ GameObject:
   - component: {fileID: 2902719746019565114}
   - component: {fileID: 2902719746019565115}
   - component: {fileID: 2902719746019565112}
+  - component: {fileID: 5135225297841848391}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -1241,6 +1272,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &5135225297841848391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2902719746019565118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23f7af533a7a89443a33799cdbdc3b62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HoverClarifyText: Sorts cards alphabetically
+  scale: 1
 --- !u!1 &2902719746200179816
 GameObject:
   m_ObjectHideFlags: 0

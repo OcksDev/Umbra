@@ -1,4 +1,5 @@
 
+using System.Buffers.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -47,6 +48,7 @@ public class Gamer : MonoBehaviour
     public int SweepCount = 0;
 
     public bool AllowIllegalImmigration = false;
+    public bool Junkyard = false;
     public int HandSizeSel = 7;
 
     public int Level = 0;
@@ -116,6 +118,7 @@ public class Gamer : MonoBehaviour
     private TextMeshProUGUI dolphin;
     public string MultiMoveData = "";
     public bool MutliMoveForward = false;
+    public string hoveringonmyballsinyourjaw = "";
 
 
     public int DisplayType = -1;
@@ -164,6 +167,7 @@ public class Gamer : MonoBehaviour
 
         AiDiffSelect = 0;
         AllowIllegalImmigration = false;
+        Junkyard = false;
         HandSizeSel = 7;
 
         pplooker = Placer.GetComponent<SpriteRenderer>();
@@ -312,7 +316,7 @@ public class Gamer : MonoBehaviour
 
     public const float DefaultDelay = 0.1f;
     public const float DefaultStartDelay = 0f;
-    List<int> determined_draw_cards = new List<int>();
+    public List<int> determined_draw_cards = new List<int>();
     public void DrawCards(int amount, float delay = DefaultDelay, float start_delay = DefaultStartDelay)
     {
         StartCoroutine(DrawCardsCor(amount, delay, start_delay));
@@ -410,6 +414,10 @@ public class Gamer : MonoBehaviour
             {
                 FreezeState = false;
                 PlacerCard = null;
+            }
+            else if (checks[14])
+            {
+                TogglePickerMenu();
             }
             else if (checks[1])
             {
@@ -602,6 +610,17 @@ public class Gamer : MonoBehaviour
         //Debug.Log(MousePosMainUnScaled.x + ", " + MousePosMainUnScaled.y);
         MousePosMain = cam.ScreenToWorldPoint(Input.mousePosition);
         MousePos = (MousePosMain * gg) + miscrefs[16].transform.position;
+
+        if(hoveringonmyballsinyourjaw != "")
+        {
+            miscrefs[97].SetActive(true);
+            miscrefs[98].GetComponent<TextMeshProUGUI>().text = hoveringonmyballsinyourjaw;
+            hoveringonmyballsinyourjaw = "";
+        }
+        else
+        {
+            miscrefs[97].SetActive(false);
+        }
 
         if (canupdatemysex)
         {
@@ -808,8 +827,6 @@ public class Gamer : MonoBehaviour
         {
             if (checks[6])
             {
-                bool k = RandomFunctions.Instance.CheckInsideRect(rectum, MousePosMainUnScaled, cam);
-                miscrefs[33].SetActive(k);
                 buttsex.interactable = CanDeleteDeck();
             }
         }
@@ -2340,6 +2357,11 @@ public class Gamer : MonoBehaviour
 
                 miscrefs[94].GetComponent<ITurnCountShitBitch>().UpdateColors(!IsPlayerTurn);
 
+                if (Junkyard && IsPlayerTurn)
+                {
+                    Debug.Log("gigassssss");
+                    dick.CardsInDeck.Add(new Card(30));
+                }
 
                 if (IsPlayerTurn)
                 {
@@ -2543,6 +2565,10 @@ public class Gamer : MonoBehaviour
                 return 8;
             case 25:
                 return 11;
+            case 29:
+                return 14;
+            case 30:
+                return 15;
             case 23:
             case 17:
                 return 9;
@@ -2746,6 +2772,17 @@ public class Gamer : MonoBehaviour
         }
         switch (type)
         {
+            case 15:
+                if (canclick)
+                {
+
+                    if (player)
+                    {
+                        DrawCards(1, DefaultDelay, 0.1f);
+                        EndTurnCheck();
+                    }
+                }
+                break;
             case 1:
                 if (canclick)
                 {
@@ -3177,6 +3214,19 @@ public class Gamer : MonoBehaviour
                     {
                         DrawCards(1, DefaultDelay, 0.1f);
                         EndTurnCheck();
+                    }
+                }
+                break;
+            case 14:
+                if (canclick)
+                {
+                    if (player)
+                    {
+                        TogglePickerMenu();
+                    }
+                    else
+                    {
+                        //ai draw I guess
                     }
                 }
                 break;
@@ -3801,26 +3851,35 @@ public class Gamer : MonoBehaviour
             }
         }
 
-
-        if (PlayerWon && !Multiplayer)
+        if (PlayerWon)
         {
             //game end win stuff
             long basexp = 100;
-            switch (AIDifficulty)
+            if (!Multiplayer)
             {
-                case -1:
-                    basexp -= 20;
-                    break;
-                case 1:
-                    basexp += 20;
-                    break;
-                case 2:
-                    basexp += 50;
-                    break;
+                switch (AIDifficulty)
+                {
+                    case -1:
+                        basexp -= 20;
+                        break;
+                    case 1:
+                        basexp += 20;
+                        break;
+                    case 2:
+                        basexp += 50;
+                        break;
+                }
             }
-
+            if (Junkyard)
+            {
+                basexp += 50;
+            }
             StartCoroutine(WinLevelUpAnim(XP, XP + basexp));
             XP += basexp;
+        }
+        else if (!PlayerWon)
+        {
+            StartCoroutine(WinLevelUpAnim(XP, XP));
         }
 
         if (Multiplayer)
@@ -3884,9 +3943,10 @@ public class Gamer : MonoBehaviour
         determined_draw_cards.Clear();
         Multiplayer = false;
         GameState = "Main Menu";
-        miscrefs[33].SetActive(false);
         PlayerLastCard = null;
         AILastCard = null;
+        LastCardTrue = null;
+        AILastCardTrue = null;
         LocalHandJob = null;
         AllHandJobs.Clear();
         PlacerCard = null;
@@ -4034,7 +4094,7 @@ public class Gamer : MonoBehaviour
         {
             homie.text = "Legal Deck";
             homie.color = homie_colors[0];
-            miscrefs[32].GetComponent<TextMeshProUGUI>().text = "Deck is valid";
+            miscrefs[31].GetComponent<HoveringBallsInYourJaw>().HoverClarifyText = "Deck is valid";
         }
         else
         {
@@ -4043,10 +4103,9 @@ public class Gamer : MonoBehaviour
             string hh = "";
             foreach (var e in deck.Errors)
             {
-                hh += e + "<br>";
+                hh += e + ", ";
             }
-
-            miscrefs[32].GetComponent<TextMeshProUGUI>().text = hh;
+            miscrefs[31].GetComponent<HoveringBallsInYourJaw>().HoverClarifyText = hh;
         }
 
     }
@@ -4275,8 +4334,30 @@ public class Gamer : MonoBehaviour
         miscrefs[37].GetComponent<Button>().interactable = eee;
     }
 
-
-
+    public void TogglePickerMenu()
+    {
+        checks[14] = !checks[14];
+        if (checks[14])
+        {
+            foreach(var cd in miscrefs[96].GetComponentsInChildren<CardDisplay>())
+            {
+                Destroy(cd.gameObject);
+            }
+            for(int i = 0; i < 3; i++)
+            {
+                var cd = RandomFunctions.Instance.SpawnObject(1, miscrefs[96], miscrefs[96].transform.position, miscrefs[96].transform.rotation, false, "").GetComponent<CardDisplay>();
+                cd.state = 7;
+                cd.GetComponent<SpawnData>().card = dick.DrawCard();
+                cd.transform.localScale = new Vector3(1.5f, 1.5f, 1);
+            }
+        }
+        else
+        {
+            DrawCards(1, DefaultDelay, 0.1f);
+            EndTurnCheck();
+        }
+        UpdateMenus();
+    }
 
     public void UpdateMenus()
     {
@@ -4296,6 +4377,7 @@ public class Gamer : MonoBehaviour
         miscrefs[54].SetActive(checks[11]); // achievementos overgay
         miscrefs[59].SetActive(checks[12]); // logbook
         miscrefs[61].SetActive(checks[13]); // card desc overlay
+        miscrefs[95].SetActive(checks[14]); // picker menu
         miscrefs[8].SetActive(!Multiplayer);
         miscrefs[9].SetActive(Multiplayer);
         miscrefs[93].SetActive(Multiplayer);
@@ -5059,6 +5141,14 @@ public class Card
             case 28:
                 energy = 2;
                 SubNumber = 2;
+                again = true;
+                break;
+            case 29:
+                energy = 2;
+                again = true;
+                break;
+            case 30:
+                energy = 1;
                 again = true;
                 break;
         }

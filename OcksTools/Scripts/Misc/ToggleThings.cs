@@ -17,6 +17,9 @@ public class ToggleThings : MonoBehaviour
             case 0:
                 things.isOn = Gamer.Instance.AllowIllegalImmigration;
                 break;
+            case 1:
+                things.isOn = Gamer.Instance.Junkyard;
+                break;
         }
     }
 
@@ -31,6 +34,9 @@ public class ToggleThings : MonoBehaviour
         {
             case 0:
                 Gamer.Instance.AllowIllegalImmigration = things.isOn;
+                break;
+            case 1:
+                Gamer.Instance.Junkyard = things.isOn;
                 break;
         }
     }

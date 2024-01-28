@@ -114,8 +114,13 @@ public class CardDisplay : MonoBehaviour
             case 20:
             case 25:
             case 27:
+            case 29:
                 sizeofmyballs.x = 1.4f;
                 sizeofmyballs.y = 1.4f;
+                break;
+            case 28:
+                sizeofmyballs.x = 1.7f;
+                sizeofmyballs.y = 1.7f;
                 break;
             case 11:
                 sizeofmyballs.x = 2.1f;
@@ -283,7 +288,7 @@ public class CardDisplay : MonoBehaviour
         var g = Gamer.instance;
         if (g.GameState == "Game")
         {
-            if (state != 3 && state != 5)
+            if (state != 3 && state != 5 && state != 7)
             {
                 var g2 = Gamer.Instance.miscrefs[13].GetComponentsInChildren<Projectile>();
                 if (g2.Length > 0)
@@ -309,7 +314,10 @@ public class CardDisplay : MonoBehaviour
                         butt.interactable = good;
                     }
                 }
-
+            }
+            if(state == 7)
+            {
+                butt.interactable = true;
             }
         }
         else if (g.GameState == "Main Menu")
@@ -405,6 +413,10 @@ public class CardDisplay : MonoBehaviour
                 g.ToggleLogbookOvergay();
                 break;
             case 6:
+                break;
+            case 7:
+                g.determined_draw_cards.Add(spawnData.card.CardType);
+                g.TogglePickerMenu();
                 break;
         }
     }
